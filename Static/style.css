@@ -1,0 +1,337 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --bg: #050713;
+    --surface: #111a30;
+    --blue: #5578ff;
+    --violet: #9565ff;
+    --cyan: #55d9ff;
+    --text: #f5f7ff;
+    --muted: #929db8;
+    --border: rgba(255,255,255,0.09);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(ellipse at 50% 50%, #10102b 0%, #070916 55%, #02030a 100%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    isolation: isolate;
+    font-family: 'Inter', sans-serif;
+}
+
+/* THREE.JS 3D SPACE CANVAS */
+
+#spaceCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* NAVBAR */
+
+.navbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 9%;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,13,27,0.45);
+    backdrop-filter: blur(15px);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+
+.logo span {
+    background: linear-gradient(110deg, #668aff, #b08aff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.nav-label {
+    color: #9ca9c9;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* HERO */
+
+.hero {
+    position: relative;
+    z-index: 2;
+    max-width: 850px;
+    margin: 85px auto;
+    padding: 20px;
+    text-align: center;
+    animation: appear 1s ease both;
+}
+
+.tag {
+    display: inline-block;
+    padding: 10px 17px;
+    border: 1px solid rgba(105,130,255,0.3);
+    background: rgba(85,120,255,0.10);
+    color: #9db0ff;
+    border-radius: 30px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    box-shadow: 0 0 25px rgba(85,120,255,0.08);
+}
+
+h1 {
+    font-size: clamp(42px, 7vw, 72px);
+    line-height: 1.1;
+    letter-spacing: -3.5px;
+    font-weight: 800;
+}
+
+h1 span {
+    background: linear-gradient(100deg, #6389ff, #a779ff, #58d9ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% auto;
+    animation: gradientMove 5s ease infinite;
+}
+
+.subtitle {
+    max-width: 560px;
+    margin: 24px auto 35px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+/* PLATFORM BUTTONS */
+
+.platforms {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.platform {
+    padding: 13px 27px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.035);
+    color: #aab5ce;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.platform:hover {
+    border-color: rgba(85,120,255,0.6);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.platform.active {
+    color: white;
+    border-color: #6688ff;
+    background: linear-gradient(110deg, #496cff, #7956ed);
+    box-shadow: 0 5px 25px rgba(85,120,255,0.28);
+}
+
+/* ANALYZER CARD */
+
+.analyzer {
+    background: linear-gradient(
+        145deg,
+        rgba(24,35,62,0.93),
+        rgba(14,22,42,0.93)
+    );
+    border: 1px solid rgba(140,160,255,0.16);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: left;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+    transition: 0.4s ease;
+    backdrop-filter: blur(16px);
+}
+
+.analyzer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #698aff,
+        #a67bff,
+        transparent
+    );
+}
+
+.analyzer:hover {
+    border-color: rgba(112,140,255,0.35);
+    box-shadow: 0 25px 90px rgba(62,91,255,0.12);
+}
+
+.analyzer label {
+    display: block;
+    color: #e5eaff;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 15px 0 11px;
+}
+
+textarea,
+input {
+    width: 100%;
+    padding: 16px;
+    background: rgba(5,11,25,0.7);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+textarea::placeholder,
+input::placeholder {
+    color: #67738f;
+}
+
+textarea:focus,
+input:focus {
+    border-color: #6688ff;
+    box-shadow: 0 0 0 3px rgba(85,120,255,0.12);
+}
+
+/* ANALYZE BUTTON */
+
+.analyze-btn {
+    width: 100%;
+    padding: 17px;
+    margin-top: 24px;
+    border: none;
+    border-radius: 13px;
+    background: linear-gradient(100deg, #5279ff, #8558f4);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(85,120,255,0.22);
+    transition: 0.35s ease;
+}
+
+.analyze-btn span {
+    margin-left: 8px;
+}
+
+.analyze-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(85,120,255,0.4);
+    filter: brightness(1.12);
+}
+
+.analyze-btn:active {
+    transform: scale(0.98);
+}
+
+.privacy {
+    margin-top: 25px;
+    color: #a0abc5;
+    font-size: 12px;
+}
+
+/* ANIMATIONS */
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 20px 6%;
+    }
+
+    .hero {
+        margin: 45px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        letter-spacing: -2px;
+    }
+
+    .analyzer {
+        padding: 22px;
+    }
+
+    .nav-label {
+        font-size: 8px;
+    }
+
+    .platform {
+        padding: 12px 22px;
+    }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,643 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioLens AI — Instagram Profile Analyzer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+
+    <canvas id="spaceCanvas"></canvas>
+
+    <nav class="navbar">
+        <div class="logo">BioLens<span>AI.</span></div>
+        <div class="nav-label">AI PROFILE ANALYZER</div>
+    </nav>
+
+    <main class="hero">
+
+        <div class="tag">✦ YOUR PROFILE, REIMAGINED</div>
+
+        <h1>
+            Make your profile<br>
+            <span>impossible to ignore.</span>
+        </h1>
+
+        <p class="subtitle">
+            Upload your Instagram profile screenshot and get
+            AI-powered insights to make your profile stand out.
+        </p>
+
+        <div class="platforms">
+            <button class="platform active" type="button">Instagram</button>
+        </div>
+
+        <div class="analyzer">
+
+            <label for="profileImage">Upload Instagram Profile Screenshot</label>
+
+            <div class="upload-section"
+                 style="margin: 12px 0 22px; padding: 20px; border: 1px dashed rgba(160,180,255,0.5); border-radius: 14px; background: rgba(255,255,255,0.04);">
+
+                <input
+                    type="file"
+                    id="profileImage"
+                    accept="image/png,image/jpeg,image/webp"
+                    hidden
+                >
+
+                <label for="profileImage"
+                       style="display:block; cursor:pointer; text-align:center;">
+
+                    <span style="font-size:32px;">📸</span>
+
+                    <p style="margin:10px 0 5px; color:#ffffff;">
+                        Click to upload your profile screenshot
+                    </p>
+
+                    <small style="color:#aab3d0;">
+                        PNG, JPG or WEBP · One image only
+                    </small>
+
+                </label>
+
+                <div id="previewContainer"
+                     style="display:none; margin-top:18px; text-align:center;">
+
+                    <img
+                        id="imagePreview"
+                        alt="Instagram profile screenshot preview"
+                        style="max-width:100%; max-height:350px; border-radius:12px; object-fit:contain;"
+                    >
+
+                    <p id="imageName"
+                       style="color:#c5cbea; font-size:13px; margin:10px 0;">
+                    </p>
+
+                    <button
+                        type="button"
+                        id="removeImage"
+                        style="padding:8px 16px; border:1px solid rgba(255,255,255,0.3); border-radius:20px; background:transparent; color:white; cursor:pointer;">
+                        Remove image ✕
+                    </button>
+
+                </div>
+
+                <p id="uploadError"
+                   style="display:none; color:#ff8b8b; text-align:center; font-size:13px; margin-top:12px;">
+                </p>
+
+            </div>
+
+            <label for="nicheInput">Your niche (optional)</label>
+
+            <input
+                type="text"
+                id="nicheInput"
+                placeholder="e.g. Fitness, Education, Technology"
+            >
+
+            <button class="analyze-btn" type="button" id="analyzeButton">
+                Analyze my profile <span>→</span>
+            </button>
+
+        </div>
+
+        <p class="privacy">
+            ✦ No login required. Your profile, your control.
+        </p>
+
+    </main>
+
+<script>
+
+// ======================================
+// IMAGE UPLOAD AND PREVIEW
+// ======================================
+
+const profileImage = document.getElementById("profileImage");
+const imagePreview = document.getElementById("imagePreview");
+const previewContainer = document.getElementById("previewContainer");
+const imageName = document.getElementById("imageName");
+const removeImage = document.getElementById("removeImage");
+const uploadError = document.getElementById("uploadError");
+
+profileImage.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    uploadError.style.display = "none";
+
+    if (!file) return;
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        uploadError.textContent = "Please upload a JPG, PNG or WEBP image.";
+        uploadError.style.display = "block";
+        this.value = "";
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        uploadError.textContent = "Image size must be less than 10 MB.";
+        uploadError.style.display = "block";
+        this.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+        imagePreview.src = event.target.result;
+        imageName.textContent = file.name;
+        previewContainer.style.display = "block";
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+removeImage.addEventListener("click", function () {
+
+    profileImage.value = "";
+    imagePreview.src = "";
+    imageName.textContent = "";
+    previewContainer.style.display = "none";
+    uploadError.style.display = "none";
+
+});
+
+
+// ======================================
+// AI PROFILE ANALYSIS
+// ======================================
+
+const analyzeButton = document.getElementById("analyzeButton");
+
+analyzeButton.addEventListener("click", async function () {
+
+    const file = profileImage.files[0];
+    const niche = document.getElementById("nicheInput").value.trim();
+
+    if (!file) {
+        uploadError.textContent =
+            "Please upload your Instagram profile screenshot first.";
+
+        uploadError.style.display = "block";
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("profileImage", file);
+    formData.append("niche", niche);
+
+    analyzeButton.disabled = true;
+    analyzeButton.textContent = "Analyzing your profile...";
+
+    uploadError.style.display = "none";
+
+    try {
+
+        const response = await fetch("/analyze", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || "Analysis failed.");
+        }
+
+        if (
+            typeof result.overall_score !== "number" ||
+            !result.category_scores ||
+            !result.english ||
+            !result.hindi
+        ) {
+            throw new Error("The AI returned an incomplete report. Please try again.");
+        }
+
+        sessionStorage.setItem(
+            "biolensReport",
+            JSON.stringify(result)
+        );
+
+        document.body.style.transition = "opacity 0.35s ease";
+        document.body.style.opacity = "0";
+
+        setTimeout(() => {
+            window.location.href = "/results";
+        }, 350);
+
+    } catch (error) {
+
+        alert(error.message);
+        document.body.style.opacity = "1";
+
+    } finally {
+
+        analyzeButton.disabled = false;
+
+        analyzeButton.innerHTML =
+            'Analyze my profile <span>→</span>';
+
+    }
+
+});
+
+
+// ======================================
+// THREE.JS SOLAR SYSTEM
+// ======================================
+
+window.addEventListener("load", () => {
+
+    const canvas = document.getElementById("spaceCanvas");
+
+    if (!window.THREE || !canvas) {
+        console.error("Three.js or canvas not found");
+        return;
+    }
+
+    const scene = new THREE.Scene();
+
+    const solarSystem = new THREE.Group();
+
+    solarSystem.position.set(12, -2, -3);
+    solarSystem.scale.setScalar(0.65);
+
+    scene.add(solarSystem);
+
+    const camera = new THREE.PerspectiveCamera(
+        55,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
+
+    camera.position.set(0, 5, 12);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true
+    });
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, 2)
+    );
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+
+    // STARFIELD
+
+    const starGeometry = new THREE.BufferGeometry();
+    const starPositions = [];
+
+    for (let i = 0; i < 3500; i++) {
+
+        starPositions.push(
+            (Math.random() - 0.5) * 180,
+            (Math.random() - 0.5) * 100,
+            (Math.random() - 0.5) * 100
+        );
+
+    }
+
+    starGeometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(starPositions, 3)
+    );
+
+    const stars = new THREE.Points(
+        starGeometry,
+        new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.13,
+            transparent: true,
+            opacity: 0.85
+        })
+    );
+
+    scene.add(stars);
+
+
+    // LIGHTING
+
+    scene.add(new THREE.AmbientLight(0x657090, 0.45));
+
+    const sunlight = new THREE.PointLight(
+        0xffd5a0,
+        5,
+        100
+    );
+
+    sunlight.position.set(0, 0, 0);
+    solarSystem.add(sunlight);
+
+
+    // TEXTURE LOADER
+
+    const textureLoader = new THREE.TextureLoader();
+
+    const textureFiles = {
+        Mercury: "2k_mercury.jpg",
+        Venus: "2k_venus_surface.jpg",
+        Earth: "2k_earth_daymap.jpg",
+        Mars: "2k_mars.jpg",
+        Jupiter: "2k_jupiter.jpg",
+        Saturn: "2k_saturn.jpg",
+        Uranus: "2k_uranus.jpg",
+        Neptune: "2k_neptune.jpg"
+    };
+
+
+    // SUN
+
+    const sunTexture = textureLoader.load(
+        "/static/textures/sun.jpg",
+        () => console.log("Sun texture loaded"),
+        undefined,
+        (error) => console.error("Sun texture failed:", error)
+    );
+
+    sunTexture.encoding = THREE.sRGBEncoding;
+
+    const sun = new THREE.Mesh(
+        new THREE.SphereGeometry(1.15, 96, 96),
+        new THREE.MeshBasicMaterial({
+            map: sunTexture,
+            color: 0xffffff
+        })
+    );
+
+    solarSystem.add(sun);
+
+
+    // PLANETS
+
+    const planets = [
+        { name: "Mercury", radius: 2.0, size: 0.26, speed: 0.8 },
+        { name: "Venus", radius: 2.8, size: 0.46, speed: 0.58 },
+        { name: "Earth", radius: 3.8, size: 0.54, speed: 0.43 },
+        { name: "Mars", radius: 4.8, size: 0.38, speed: 0.34 },
+        { name: "Jupiter", radius: 6.2, size: 1.36, speed: 0.22 },
+        { name: "Saturn", radius: 7.8, size: 1.12, speed: 0.16 },
+        { name: "Uranus", radius: 9.4, size: 0.78, speed: 0.12 },
+        { name: "Neptune", radius: 10.8, size: 0.74, speed: 0.09 }
+    ];
+
+    const orbitObjects = [];
+
+    planets.forEach((data) => {
+
+        // ORBIT PATH
+
+        const orbitGeometry = new THREE.BufferGeometry();
+        const points = [];
+
+        for (let i = 0; i <= 160; i++) {
+
+            const angle = (i / 160) * Math.PI * 2;
+
+            points.push(
+                new THREE.Vector3(
+                    Math.cos(angle) * data.radius,
+                    0,
+                    Math.sin(angle) * data.radius
+                )
+            );
+
+        }
+
+        orbitGeometry.setFromPoints(points);
+
+        const orbitLine = new THREE.LineLoop(
+            orbitGeometry,
+            new THREE.LineBasicMaterial({
+                color: 0x7889bb,
+                transparent: true,
+                opacity: 0.17
+            })
+        );
+
+        solarSystem.add(orbitLine);
+
+
+        // ORBIT PIVOT
+
+        const pivot = new THREE.Group();
+
+        pivot.rotation.y = Math.random() * Math.PI * 2;
+
+        solarSystem.add(pivot);
+
+
+        // PLANET TEXTURE
+
+        const texturePath =
+            `/static/textures/${textureFiles[data.name]}`;
+
+        const texture = textureLoader.load(
+            texturePath,
+            () => console.log(data.name + " texture loaded"),
+            undefined,
+            (error) => console.error(
+                "Planet texture failed:",
+                data.name,
+                error
+            )
+        );
+
+        texture.encoding = THREE.sRGBEncoding;
+
+        const planetMaterial = new THREE.MeshStandardMaterial({
+            map: texture,
+            roughness: 0.9,
+            metalness: 0
+        });
+
+        const planet = new THREE.Mesh(
+            new THREE.SphereGeometry(data.size, 64, 64),
+            planetMaterial
+        );
+
+        planet.position.x = data.radius;
+
+        pivot.add(planet);
+
+
+        // SATURN RINGS
+
+        if (data.name === "Saturn") {
+
+            const ringTexture = textureLoader.load(
+                "/static/textures/8k_saturn_ring_alpha.jpg",
+
+                () => console.log(
+                    "Saturn ring texture loaded successfully"
+                ),
+
+                undefined,
+
+                (error) => console.error(
+                    "Saturn ring texture failed:",
+                    error
+                )
+            );
+
+            ringTexture.encoding = THREE.sRGBEncoding;
+
+            ringTexture.anisotropy =
+                renderer.capabilities.getMaxAnisotropy();
+
+            const ringGeometry = new THREE.RingGeometry(
+                data.size * 1.25,
+                data.size * 2.5,
+                256
+            );
+
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                map: ringTexture,
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 1,
+                depthWrite: false,
+                alphaTest: 0.02
+            });
+
+            const ring = new THREE.Mesh(
+                ringGeometry,
+                ringMaterial
+            );
+
+            ring.position.set(data.radius, 0, 0);
+            ring.rotation.x = -Math.PI / 2.5;
+
+            pivot.add(ring);
+
+            console.log("Saturn rings created");
+
+        }
+
+        orbitObjects.push({
+            pivot: pivot,
+            planet: planet,
+            speed: data.speed
+        });
+
+    });
+
+
+    // MOUSE AND TOUCH PARALLAX
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    let targetX = 0;
+    let targetY = 0;
+
+    window.addEventListener("pointermove", (event) => {
+
+        targetX =
+            (event.clientX / window.innerWidth - 0.5) * 1.2;
+
+        targetY =
+            (event.clientY / window.innerHeight - 0.5) * 0.7;
+
+    });
+
+    window.addEventListener("touchmove", (event) => {
+
+        if (!event.touches.length) return;
+
+        targetX =
+            (event.touches[0].clientX / window.innerWidth - 0.5) * 1.2;
+
+        targetY =
+            (event.touches[0].clientY / window.innerHeight - 0.5) * 0.7;
+
+    }, { passive: true });
+
+
+    // ANIMATION
+
+    function animate() {
+
+        requestAnimationFrame(animate);
+
+        mouseX += (targetX - mouseX) * 0.025;
+        mouseY += (targetY - mouseY) * 0.025;
+
+        orbitObjects.forEach((obj) => {
+
+            obj.pivot.rotation.y += obj.speed * 0.0015;
+            obj.planet.rotation.y += 0.004;
+
+        });
+
+        sun.rotation.y += 0.0015;
+
+        stars.rotation.y += 0.00008;
+
+        camera.position.x +=
+            (mouseX - camera.position.x * 0.015) * 0.02;
+
+        camera.position.y +=
+            ((5 - mouseY) - camera.position.y) * 0.015;
+
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+
+    }
+
+    animate();
+
+
+    // RESPONSIVE RESIZE
+
+    window.addEventListener("resize", () => {
+
+        camera.aspect =
+            window.innerWidth / window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+        renderer.setPixelRatio(
+            Math.min(window.devicePixelRatio, 2)
+        );
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

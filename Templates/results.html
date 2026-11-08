@@ -1,0 +1,884 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioLens AI | Your Profile Report</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Poppins', Arial, sans-serif;
+    color: #fff;
+    background: radial-gradient(ellipse at top, #18234b 0%, #090d20 50%, #03040b 100%);
+    overflow-x: hidden;
+    padding: 30px 16px 60px;
+}
+
+.space-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -3;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+        radial-gradient(1px 1px at 90px 80px, #fff, transparent),
+        radial-gradient(2px 2px at 160px 140px, #fff, transparent),
+        radial-gradient(1px 1px at 250px 50px, #fff, transparent),
+        radial-gradient(2px 2px at 320px 190px, #fff, transparent);
+    background-size: 350px 250px;
+    opacity: .65;
+}
+
+.mercury {
+    position: fixed;
+    width: 250px;
+    height: 250px;
+    top: 10%;
+    right: 5%;
+    border-radius: 50%;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/static/textures/2k_mercury.jpg");
+    background-size: cover;
+    background-position: center;
+    box-shadow:
+        0 0 12px 4px rgba(235,240,255,.75),
+        0 0 30px 12px rgba(190,205,230,.55),
+        0 0 65px 28px rgba(150,175,210,.35),
+        0 0 115px 50px rgba(120,150,200,.20),
+        inset -35px -15px 55px rgba(0,0,0,.65),
+        inset 10px 5px 30px rgba(255,255,255,.3);
+    animation: mercuryJourney 35s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.mercury::before {
+    content: "";
+    position: absolute;
+    inset: -40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,230,255,.25) 35%, rgba(160,185,225,.15) 55%, transparent 75%);
+    filter: blur(20px);
+    z-index: -1;
+    animation: glowPulse 4s ease-in-out infinite alternate;
+}
+
+.mercury::after {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid rgba(220,230,255,.2);
+    box-shadow: 0 0 15px rgba(220,230,255,.4), 0 0 30px rgba(190,210,245,.3);
+}
+
+@keyframes glowPulse {
+    from { opacity: .65; transform: scale(.96); }
+    to { opacity: 1; transform: scale(1.12); }
+}
+
+@keyframes mercuryJourney {
+    0% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+    25% { transform: translate3d(-100px,80px,0) rotate(8deg) scale(1.05); }
+    50% { transform: translate3d(-220px,170px,0) rotate(16deg) scale(1.1); }
+    75% { transform: translate3d(-130px,250px,0) rotate(24deg) scale(1.06); }
+    100% { transform: translate3d(-40px,120px,0) rotate(32deg) scale(1); }
+}
+
+.earth {
+    position: fixed;
+    width: 220px;
+    height: 220px;
+    bottom: 7%;
+    left: 4%;
+    border-radius: 50%;
+    background-image: url("/static/textures/2k_earth_daymap.jpg");
+    background-size: cover;
+    background-position: center;
+    box-shadow:
+        0 0 15px 5px rgba(80,170,255,.65),
+        0 0 35px 15px rgba(40,130,255,.45),
+        0 0 80px 30px rgba(20,90,255,.30),
+        0 0 130px 50px rgba(20,80,255,.15),
+        inset -35px -15px 55px rgba(0,0,25,.65),
+        inset 10px 5px 30px rgba(255,255,255,.2);
+    z-index: -1;
+    pointer-events: none;
+    will-change: transform;
+    animation: earthJourney 34s ease-in-out infinite alternate;
+}
+
+.earth::before {
+    content: "";
+    position: absolute;
+    inset: -35px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(80,160,255,.25) 35%, rgba(35,110,255,.15) 60%, transparent 75%);
+    filter: blur(20px);
+    z-index: -1;
+}
+
+@keyframes earthJourney {
+    0% { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+    20% { transform: translate3d(110px,-90px,0) rotate(15deg) scale(1.08); }
+    40% { transform: translate3d(230px,-180px,0) rotate(30deg) scale(1.14); }
+    60% { transform: translate3d(320px,-100px,0) rotate(45deg) scale(1.1); }
+    80% { transform: translate3d(180px,-220px,0) rotate(55deg) scale(1.06); }
+    100% { transform: translate3d(70px,-150px,0) rotate(70deg) scale(1); }
+}
+
+.container {
+    width: 100%;
+    max-width: 1050px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    background: linear-gradient(90deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.nav-link {
+    color: #e2d7f8;
+    text-decoration: none;
+    font-size: 14px;
+    transition: .3s;
+}
+
+.nav-link:hover { color: #ff72b6; }
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: clamp(30px,5vw,44px);
+    margin-bottom: 10px;
+    font-weight: 800;
+    background: linear-gradient(90deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.header p {
+    color: #b8b9d5;
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.card {
+    background: rgba(18,20,43,.84);
+    border: 1px solid rgba(214,41,118,.22);
+    border-radius: 22px;
+    padding: 25px;
+    margin-bottom: 22px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 35px rgba(0,0,0,.2);
+    transition: border-color .3s, transform .3s;
+}
+
+.card:hover { border-color: rgba(214,41,118,.42); }
+
+.score-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 45px;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.score-ring {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(#feda75 0deg,#d62976 0deg,#833ab4 0deg,rgba(255,255,255,.08) 0deg);
+    position: relative;
+    transition: background 1s ease;
+    box-shadow: 0 0 30px rgba(214,41,118,.14);
+}
+
+.score-ring::before {
+    content: "";
+    position: absolute;
+    width: 158px;
+    height: 158px;
+    background: #11152e;
+    border-radius: 50%;
+}
+
+.score-content { position: relative; z-index: 1; }
+
+.score-number {
+    font-size: 48px;
+    font-weight: 800;
+    background: linear-gradient(90deg,#feda75,#fa7e1e,#d62976,#a64ac9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.score-label { font-size: 13px; color: #b8b9d5; }
+
+.score-description h2 {
+    font-size: 25px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.score-description p {
+    color: #b9c3e5;
+    max-width: 400px;
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.section-title {
+    font-size: 21px;
+    margin-bottom: 20px;
+    color: #f4eaff;
+    font-weight: 700;
+}
+
+.category { margin-bottom: 19px; }
+
+.category-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #e0ddf3;
+}
+
+.category-top span:last-child {
+    color: #ff8ac2;
+    font-weight: 600;
+}
+
+.progress {
+    height: 9px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.1);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 20px;
+    background: linear-gradient(90deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+    transition: width 1.2s ease;
+}
+
+.three-columns {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 18px;
+}
+
+.list-card {
+    padding: 22px;
+    border-radius: 17px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.09);
+    transition: transform .3s,border-color .3s;
+}
+
+.list-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(214,41,118,.35);
+}
+
+.list-card h3 {
+    margin-bottom: 15px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.list-card ul { padding-left: 19px; }
+
+.list-card li {
+    color: #c1cbe9;
+    line-height: 1.8;
+    margin-bottom: 11px;
+    font-size: 13px;
+}
+
+.strengths h3 { color: #65e6b1; }
+.weaknesses h3 { color: #ff9d9d; }
+.improvements h3 { color: #d3a0ff; }
+
+.language-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.language-buttons { display: flex; gap: 8px; }
+
+.language-buttons button {
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.06);
+    color: #dce5ff;
+    padding: 9px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: .3s;
+}
+
+.language-buttons button:hover { border-color: #d62976; }
+
+.language-buttons button.active {
+    background: linear-gradient(100deg,#fa7e1e,#d62976,#833ab4);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 15px rgba(214,41,118,.25);
+}
+
+.feedback-item {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+}
+
+.feedback-item:last-child { border-bottom: none; }
+
+.feedback-item h3 {
+    font-size: 15px;
+    color: #ff8ac2;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.feedback-item p {
+    color: #c3cce8;
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+/* PREDICTED BIO */
+.bio-card {
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(214,41,118,.25);
+    border-radius: 17px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform .3s,border-color .3s;
+}
+
+.bio-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(214,41,118,.55);
+}
+
+.bio-card h3 {
+    color: #ff8ac2;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.bio-text {
+    color: #e5e2f5;
+    font-size: 14px;
+    line-height: 2;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+    margin-bottom: 15px;
+}
+
+.bio-copy-btn {
+    border: none;
+    border-radius: 25px;
+    padding: 9px 18px;
+    color: white;
+    background: linear-gradient(100deg,#fa7e1e,#d62976,#833ab4);
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.bio-copy-btn:hover { opacity: .85; transform: translateY(-2px); }
+
+.footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.action-btn {
+    padding: 12px 22px;
+    border-radius: 30px;
+    border: none;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(100deg,#fa7e1e,#d62976,#833ab4);
+    box-shadow: 0 5px 18px rgba(214,41,118,.2);
+    transition: transform .25s,box-shadow .25s;
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(214,41,118,.35);
+}
+
+.action-btn.secondary {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    box-shadow: none;
+}
+
+.error-message {
+    text-align: center;
+    color: #ffaaaa;
+    padding: 30px;
+}
+
+@media (max-width:700px) {
+    body { padding: 20px 12px 40px; }
+    .three-columns { grid-template-columns: 1fr; }
+    .score-section { gap: 25px; }
+
+    .mercury {
+        width: 145px;
+        height: 145px;
+        top: 9%;
+        right: -3%;
+    }
+
+    .earth {
+        width: 120px;
+        height: 120px;
+        bottom: 5%;
+        left: 1%;
+    }
+
+    .card { padding: 19px; }
+
+    @keyframes mercuryJourney {
+        0% { transform: translate(0,0) rotate(0deg); }
+        50% { transform: translate(-65px,100px) rotate(15deg); }
+        100% { transform: translate(-20px,180px) rotate(30deg); }
+    }
+
+    @keyframes earthJourney {
+        0% { transform: translate(0,0) rotate(0deg); }
+        50% { transform: translate(100px,-100px) rotate(20deg); }
+        100% { transform: translate(50px,-180px) rotate(40deg); }
+    }
+}
+
+@media print {
+    body { background: #fff; color: #111; }
+
+    .space-stars,.mercury,.earth,.navbar,
+    .footer-actions,.language-buttons,.bio-copy-btn {
+        display: none !important;
+    }
+
+    .card {
+        background: #fff;
+        color: #111;
+        border: 1px solid #ddd;
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    .card p,.card li,.section-title,.bio-text {
+        color: #222;
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .mercury,.earth,.mercury::before {
+        animation: none;
+    }
+
+    .progress-fill { transition: none; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="space-stars"></div>
+<div class="mercury"></div>
+<div class="earth"></div>
+
+<div class="container">
+
+    <nav class="navbar">
+        <div class="logo">✦ BioLens AI</div>
+        <a href="/" class="nav-link">← Back to Home</a>
+    </nav>
+
+    <header class="header">
+        <h1>Your Profile Report</h1>
+        <p>AI-powered insights to improve your social media presence.</p>
+    </header>
+
+    <div id="reportArea">
+        <div class="card">
+            <p class="error-message">Loading your AI report...</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let reportData = null;
+let currentLanguage = "english";
+
+const categoryNames = {
+    profile_appeal: "Profile Appeal",
+    niche_match: "Niche Match",
+    visual_quality: "Visual Quality",
+    personal_branding: "Personal Branding"
+};
+
+function safeText(value) {
+    return String(value ?? "No feedback available")
+        .replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[char]);
+}
+
+function getList(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return "<li>No information available.</li>";
+    }
+
+    return items.map(item => `<li>${safeText(item)}</li>`).join("");
+}
+
+/* FORMAT BIOS INTO MULTIPLE LINES */
+function formatBio(value, fallback) {
+    let bio = String(value || fallback || "");
+
+    // Convert escaped newline sequences to actual line breaks
+    bio = bio.replace(/\\n/g, "\n");
+    bio = bio.replace(/\r\n/g, "\n");
+    bio = bio.replace(/\r/g, "\n");
+
+    // Remove unnecessary spaces
+    bio = bio.trim();
+
+    // If the AI returns one long line, split at common separators
+    if (!bio.includes("\n")) {
+        bio = bio.replace(/\s*\|\s*/g, "\n");
+        bio = bio.replace(/\s+•\s+/g, "\n");
+    }
+
+    return bio;
+}
+
+function renderPredictedBios() {
+    const bios = reportData?.predicted_bios || {};
+
+    document.getElementById("aestheticBio").textContent =
+        formatBio(
+            bios.aesthetic,
+            "✨ Dream big\n☁ Creating my own vibe\n♡ Living beautifully"
+        );
+
+    document.getElementById("professionalBio").textContent =
+        formatBio(
+            bios.professional,
+            "💼 Building my journey\n🚀 Sharing what I learn\n📩 Let's connect"
+        );
+
+    document.getElementById("coolBio").textContent =
+        formatBio(
+            bios.cool,
+            "😎 Living my way\n🔥 Creating my own path\n✨ Stay awesome"
+        );
+}
+
+async function copyBio(elementId, button) {
+    const bio = document.getElementById(elementId).textContent;
+
+    try {
+        await navigator.clipboard.writeText(bio);
+        button.textContent = "✓ Copied!";
+    } catch (error) {
+        const textArea = document.createElement("textarea");
+        textArea.value = bio;
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        try {
+            document.execCommand("copy");
+            button.textContent = "✓ Copied!";
+        } catch (copyError) {
+            button.textContent = "Copy failed";
+        }
+
+        textArea.remove();
+    }
+
+    setTimeout(() => {
+        button.textContent = "📋 Copy Bio";
+    }, 1500);
+}
+
+function renderReport() {
+    const reportArea = document.getElementById("reportArea");
+
+    if (!reportData) {
+        reportArea.innerHTML = `
+            <div class="card">
+                <div class="error-message">
+                    Report not found. Please analyze your profile again.
+                    <br><br>
+                    <a class="action-btn" href="/">Go Home</a>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const score = Math.max(
+        0,
+        Math.min(100, Number(reportData.overall_score) || 0)
+    );
+
+    const categories = reportData.category_scores || {};
+    const languageData = reportData[currentLanguage] || {};
+
+    const categoryHTML = Object.entries(categoryNames).map(([key, name]) => {
+        const value = Math.max(
+            0,
+            Math.min(100, Number(categories[key]) || 0)
+        );
+
+        return `
+            <div class="category">
+                <div class="category-top">
+                    <span>${name}</span>
+                    <span>${value}/100</span>
+                </div>
+
+                <div class="progress">
+                    <div class="progress-fill" data-score="${value}"></div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    const detailFields = [
+        ["profile_photo", "Profile Photo"],
+        ["username", "Username"],
+        ["bio", "Bio"],
+        ["presentation", "Presentation"]
+    ];
+
+    const feedbackHTML = detailFields.map(([key, title]) => `
+        <div class="feedback-item">
+            <h3>${title}</h3>
+            <p>${safeText(languageData[key])}</p>
+        </div>
+    `).join("");
+
+    reportArea.innerHTML = `
+        <section class="card">
+            <div class="score-section">
+                <div class="score-ring" id="scoreRing">
+                    <div class="score-content">
+                        <div class="score-number">${score}</div>
+                        <div class="score-label">OUT OF 100</div>
+                    </div>
+                </div>
+
+                <div class="score-description">
+                    <h2>Your Overall Score ✨</h2>
+                    <p>${safeText(
+                        languageData.summary ||
+                        reportData.analysis ||
+                        "Your profile analysis is ready."
+                    )}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">📊 Category Breakdown</h2>
+            ${categoryHTML}
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">💡 Your Profile Insights</h2>
+
+            <div class="three-columns">
+                <div class="list-card strengths">
+                    <h3>✓ Strengths</h3>
+                    <ul>${getList(reportData.strengths)}</ul>
+                </div>
+
+                <div class="list-card weaknesses">
+                    <h3>✕ Weaknesses</h3>
+                    <ul>${getList(reportData.weaknesses)}</ul>
+                </div>
+
+                <div class="list-card improvements">
+                    <h3>✦ Improvements</h3>
+                    <ul>${getList(reportData.improvements)}</ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="language-bar">
+                <h2 class="section-title" style="margin:0">
+                    📝 Detailed Feedback
+                </h2>
+
+                <div class="language-buttons">
+                    <button
+                        class="${currentLanguage === "english" ? "active" : ""}"
+                        onclick="changeLanguage('english')">
+                        English
+                    </button>
+
+                    <button
+                        class="${currentLanguage === "hindi" ? "active" : ""}"
+                        onclick="changeLanguage('hindi')">
+                        हिंदी
+                    </button>
+                </div>
+            </div>
+
+            <div id="feedbackContent">
+                ${feedbackHTML}
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">✨ Your Predicted Bio</h2>
+
+            <p style="color:#b8b9d5;font-size:13px;margin-bottom:20px;">
+                AI-generated Instagram bios based on your profile and niche.
+                Choose your favourite style and copy it!
+            </p>
+
+            <div class="bio-card">
+                <h3>✨ Aesthetic Bio</h3>
+                <p class="bio-text" id="aestheticBio"></p>
+                <button class="bio-copy-btn" onclick="copyBio('aestheticBio',this)">
+                    📋 Copy Bio
+                </button>
+            </div>
+
+            <div class="bio-card">
+                <h3>💼 Professional Bio</h3>
+                <p class="bio-text" id="professionalBio"></p>
+                <button class="bio-copy-btn" onclick="copyBio('professionalBio',this)">
+                    📋 Copy Bio
+                </button>
+            </div>
+
+            <div class="bio-card">
+                <h3>😎 Cool & Catchy Bio</h3>
+                <p class="bio-text" id="coolBio"></p>
+                <button class="bio-copy-btn" onclick="copyBio('coolBio',this)">
+                    📋 Copy Bio
+                </button>
+            </div>
+        </section>
+
+        <div class="footer-actions">
+            <a href="/" class="action-btn">
+                Analyze Another Profile
+            </a>
+
+            <button class="action-btn secondary" onclick="window.print()">
+                Download / Print Report
+            </button>
+        </div>
+    `;
+
+    const ring = document.getElementById("scoreRing");
+    const scoreDegrees = score * 3.6;
+
+    ring.style.background = `
+        conic-gradient(
+            #feda75 0deg,
+            #fa7e1e ${scoreDegrees * .25}deg,
+            #d62976 ${scoreDegrees * .55}deg,
+            #962fbf ${scoreDegrees}deg,
+            rgba(255,255,255,.08) ${scoreDegrees}deg
+        )
+    `;
+
+    requestAnimationFrame(() => {
+        document.querySelectorAll(".progress-fill").forEach(bar => {
+            bar.style.width = bar.dataset.score + "%";
+        });
+    });
+
+    renderPredictedBios();
+}
+
+function changeLanguage(language) {
+    currentLanguage = language;
+    renderReport();
+}
+
+/* LOAD REPORT */
+try {
+    const storedReport = sessionStorage.getItem("biolensReport");
+
+    if (storedReport) {
+        reportData = JSON.parse(storedReport);
+    }
+} catch (error) {
+    console.error("Could not load report:", error);
+}
+
+renderReport();
+</script>
+
+</body>
+</html>
