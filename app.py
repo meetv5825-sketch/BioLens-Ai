@@ -166,8 +166,8 @@ IMPORTANT RULES FOR PREDICTED BIOS:
 
         raw_text = response.text.strip()
         print("GEMINI RESPONSE:", repr(response.text))
-print("GEMINI FINISH REASON:", response.candidates[0].finish_reason if response.candidates else "No candidates")
-print("GEMINI USAGE:", response.usage_metadata)
+        print("GEMINI FINISH REASON:", response.candidates[0].finish_reason if response.candidates else "No candidates")
+        print("GEMINI USAGE:", response.usage_metadata)
         # Remove accidental markdown code fences
         raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
         raw_text = re.sub(r"\s*```$", "", raw_text)
