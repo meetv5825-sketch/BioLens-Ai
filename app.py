@@ -160,7 +160,7 @@ IMPORTANT RULES FOR PREDICTED BIOS:
             ],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
-                temperature=0.8
+                temperature=0.4
             )
         )
 
