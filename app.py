@@ -194,11 +194,9 @@ IMPORTANT RULES FOR PREDICTED BIOS:
         report["predicted_bios"] = predicted_bios
 
         session["report"] = report
+        session["report"] = report
 
-        return jsonify({
-            "success": True,
-            "redirect": "/results"
-        })
+        return jsonify(report)
 
     except json.JSONDecodeError:
         return jsonify({
