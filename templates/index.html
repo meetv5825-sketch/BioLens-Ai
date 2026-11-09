@@ -275,21 +275,29 @@ window.addEventListener("load", () => {
 
     const solarSystem = new THREE.Group();
 
+    const isMobile = window.innerWidth <= 600;
+
     solarSystem.position.set(0, 0, -3);
-    solarSystem.scale.setScalar(
-    window.innerWidth <= 600 ? 0.28 : 0.65
-);
+
+    // MOBILE SOLAR SYSTEM SIZE FIX
+    solarSystem.scale.setScalar(isMobile ? 0.52 : 0.65);
 
     scene.add(solarSystem);
 
     const camera = new THREE.PerspectiveCamera(
-        55,
+        isMobile ? 70 : 55,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
     );
 
-    camera.position.set(0, 12, 28);
+    // MOBILE CAMERA ZOOM FIX
+    camera.position.set(
+        0,
+        isMobile ? 8 : 12,
+        isMobile ? 18 : 28
+    );
+
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
@@ -620,6 +628,18 @@ window.addEventListener("load", () => {
     // RESPONSIVE RESIZE
 
     window.addEventListener("resize", () => {
+
+        const mobile = window.innerWidth <= 600;
+
+        solarSystem.scale.setScalar(mobile ? 0.52 : 0.65);
+
+        camera.fov = mobile ? 70 : 55;
+
+        camera.position.set(
+            0,
+            mobile ? 8 : 12,
+            mobile ? 18 : 28
+        );
 
         camera.aspect =
             window.innerWidth / window.innerHeight;
